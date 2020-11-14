@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dispensary!</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bulma@0.9.0/css/bulma.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+      integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div
+      id="Application"
+      class="has-background-warning-light animate__animated animate__fadeIn"
+      style="min-height: 100vh"
+    >
+      <!-- Nav Bar -->
+      <section class="section columns is-mobile">
+        <div class="column has-text-centered">
+          <h1 class="title is-size-1">{{title}}</h1>
+        </div>
+        <section class="section">
+          <section
+            class="section"
+            style="position: fixed; top: 0; right: 2.5vw"
+          >
+            <button class="button is-warning is-large" @click="toggleHelp">
+              <span class="icon">
+                <i class="fas fa-question"></i>
+              </span>
+              <p class="subtitle">Help</p>
+            </button>
+          </section>
+        </section>
+      </section>
+      <!-- Task View -->
+      <section
+        class="section animate__animated animate__fadeIn animate__faster"
+        v-if="title=='Tasks'"
+      >
+        <div class="container" v-if="tasks.length > 0">
+          <div class="columns is-multiline">
+            <div class="column is-4" v-for="(task, index) in tasks">
+              <!-- Tasks -->
+              <div
+                v-bind:class="[{'animate__animated animate__pulse animate__infinite' : index == firstAvailableIndex}, {'has-background-grey-light' : !task.available}, 'card']"
+                style="cursor: pointer"
+                @click="toggleModal(index);"
+              >
+                <div class="card-content animate__animated animate__fadeIn">
+                  <div class="content">
+                    <h3>Task {{index + 1}}</h3>
+                    <p class="is-size-5">{{task.name}}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Task Details Stuff (Modal) -->
+              <div
+                :id="'modal' + index"
+                class="modal animate__animated animate__fadeIn animate__faster"
+              >
+                <div
+                  class="modal-background"
+                  style="cursor: pointer"
+                  @click="toggleModal(index)"
+                ></div>
+                <div class="modal-content is-large">
+                  <div
+                    v-bind:class="[{'has-background-grey-light' : !task.available}, 'card is-size-4']"
+                  >
+                    <div class="card-content">
+                      <div class="content">
+                        <div class="columns">
+                          <div class="column has-text-left">
+                            <h4>Task {{index + 1}}</h4>
+                          </div>
+                          <div
+                            class="column has-text-right"
+                            v-if="!task.available"
+                          >
+                            <p>Being done by: {{employees[task.delegate]}}</p>
+                          </div>
+                        </div>
+                        <p>
+                          Please retrieve the following medicine for:
+                          {{task.name}}
+                        </p>
+                        <table
+                          class="table is-bordered is-striped is-narrow is-hoverable"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Medicine</th>
+                              <th>Quantity</th>
+                              <th>Location</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(value, name) in task.prescription[0]">
+                              <td>{{name}}</td>
+                              <td>{{value}}</td>
+                              <td>{{locations[name]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <qrcode-stream
+                          v-if="activeQR == index && task.available"
+                          @decode="verify"
+                          style="
+                            background-image: url('loading.webp');
+                            background-repeat: no-repeat;
+                            background-position: center;
+                          "
+                        >
+                        </qrcode-stream>
+                      </div>
+
+                      <div class="column">
+                        <div class="columns has-text-centered">
+                          <div class="column" v-if="currentUser">
+                            <div
+                              class="columns animate__animated animate__fadeIn animate__faster is-size-5"
+                            >
+                              <div class="column has-text-right">
+                                <p>Staff:</p>
+                              </div>
+                              <div class="column has-text-left">
+                                <p>{{employees[currentUser]}}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="column">
+                            <div
+                              class="box has-text-weight-semibold is-size-6"
+                              v-if="task.available && !currentUser && !error"
+                            >
+                              <p>Scan QR Code to register for this task!</p>
+                            </div>
+                            <div
+                              class="box has-background-danger has-text-weight-semibold is-size-6"
+                              v-if="task.available && error"
+                            >
+                              <p>Error: {{error}}</p>
+                            </div>
+                            <button
+                              class="button is-primary has-text-weight-semibold animate__animated animate__fadeIn animate__faster"
+                              :id="'button' + index"
+                              @click="toggleTask(index)"
+                              v-if="task.available && currentUser"
+                            >
+                              <div :id="'content' + index">
+                                Click here to confirm
+                              </div>
+                            </button>
+                            <button
+                              class="button is-danger has-text-weight-semibold animate__animated animate__fadeIn animate__faster"
+                              :id="'button' + index"
+                              @click="toggleTask(index)"
+                              v-if="!task.available"
+                            >
+                              <div :id="'content' + index">Put Back!</div>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column is-4 is-offset-one-third" v-if="tasks.length == 0">
+          <div class="box has-text-centered">
+            <button
+              class="button is-large is-loading is-fullwidth is-white"
+            ></button>
+            <div>
+              <strong>No tasks available!</strong>
+            </div>
+          </div>
+        </div>
+
+        <section class="section">
+          <section class="section" style="position: fixed; bottom: 0">
+            <button class="button is-warning is-large" @click="toggleView()">
+              <span class="icon">
+                <i class="fas fa-warehouse"></i>
+              </span>
+              <p class="subtitle">{{toggle}}</p>
+            </button>
+          </section>
+        </section>
+      </section>
+
+      <!-- Inventory View -->
+      <section
+        class="section animate__animated animate__fadeIn animate__faster"
+        v-if="title=='Inventory'"
+      >
+        <div class="container">
+          <!-- Inventory table -->
+          <table class="table is-narrow is-hoverable is-fullwidth is-size-4">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Status</th>
+                <th>Location</th>
+                <th>Alert Threshold</th>
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Status</th>
+                <th>Location</th>
+                <th>Alert Threshold</th>
+              </tr>
+            </tfoot>
+            <tbody>
+              <tr
+                v-for="(med, index) in inventory"
+                v-bind:class="[{'has-background-danger' : status(med.threshold, med.quantity) == 'Low'}]"
+              >
+                <td>{{med.name}}</td>
+                <td>{{med.quantity}}</td>
+                <td>{{status(med.threshold, med.quantity)}}</td>
+                <td>{{med.location}}</td>
+                <td>
+                  <div
+                    :id="index"
+                    class="dropdown"
+                    @click="$('#' + index).toggleClass('is-active')"
+                  >
+                    <div class="dropdown-trigger">
+                      <button
+                        class="button"
+                        aria-haspopup="true"
+                        aria-controls="dropdown-menu"
+                      >
+                        <span>{{med.threshold}}</span>
+                        <span class="icon is-small">
+                          <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                      <div class="dropdown-content">
+                        <a
+                          v-for="val in generateValues(med.total)"
+                          v-bind:class="[{'is-active' : val == med.threshold}, 'dropdown-item']"
+                          @click="setThreshold(med.name, val)"
+                          >{{val}}</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <section class="section">
+          <section class="section" style="position: fixed; bottom: 0">
+            <button class="button is-warning is-large" @click="toggleView()">
+              <span class="icon">
+                <i class="fas fa-angle-left fa-lg"></i>
+              </span>
+              <p class="subtitle">{{toggle}}</p>
+            </button>
+          </section>
+        </section>
+      </section>
+
+      <div
+        class="card has-background-danger"
+        @click="showNotification()"
+        v-if="low.length > 0"
+        style="cursor: pointer; position: fixed; bottom: 0; right: 2.5vw"
+      >
+        <div class="card-content animate__animated animate__fadeIn">
+          <div class="content">
+            <h3>Low inventory!</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notification Modal -->
+      <div
+        id="modal-noti"
+        class="modal animate__animated animate__fadeIn animate__faster"
+      >
+        <div class="modal-background"></div>
+        <div class="modal-content is-tiny">
+          <div class="card">
+            <div class="card-content">
+              <div class="content">
+                <div class="column">
+                  <h4>Low Stock Notified</h4>
+                  <p v-for="item in low">{{item}}</p>
+                </div>
+                <button class="button is-large" @click="clearNotification()">
+                  Ok ({{timer}})
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help Section -->
+      <div
+        id="help"
+        class="modal animate__animated animate__fadeIn animate__faster"
+      >
+        <div
+          class="modal-background"
+          style="cursor: pointer"
+          @click="toggleHelp"
+        ></div>
+        <div class="modal-content is-large">
+          <div class="card is-size-4">
+            <div class="card-content">
+              <div class="content">
+                <div class="column">help help</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="misc.js"></script>
+    <script src="dispensary.js"></script>
+    <script src="vueQR.js"></script>
+  </body>
+</html>
+
+<!-- Settle low logic -->
+<!-- Pagination and saving for inventory page -->
+<!-- Task comes in but not enough medication -->
+<!-- Words and stuff -->

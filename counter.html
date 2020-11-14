@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Counter!</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bulma@0.9.0/css/bulma.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+      integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <div
+      id="counter"
+      class="has-background-warning-light animate__animated animate__fadeIn"
+      style="min-height: 100vh"
+    >
+      <!-- Nav Bar -->
+      <section class="section columns is-mobile">
+        <div class="column has-text-centered">
+          <h1 class="title is-size-1">{{title}}</h1>
+        </div>
+        <section class="section">
+          <section
+            class="section"
+            style="position: fixed; top: 0; right: 2.5vw"
+          >
+            <button class="button is-warning is-large" @click="toggle('help')">
+              <span class="icon">
+                <i class="fas fa-question"></i>
+              </span>
+              <p class="subtitle">Help</p>
+            </button>
+          </section>
+        </section>
+      </section>
+      <!-- Main Screen Interface -->
+      <section class="section">
+        <div class="column">
+          <section
+            class="section animate__animated animate__fadeIn animate__faster"
+            v-if="title=='Counter'"
+          >
+            <a>
+              <div
+                class="column is-4 is-offset-one-third"
+                @click="toggle('scanner')"
+              >
+                <div class="box has-text-centered">
+                  <p class="title"><i class="fas fa-2x fa-id-card"></i></p>
+                  <p class="subtitle">Scan employee pass</p>
+                </div>
+              </div>
+            </a>
+
+            <!-- Scanner/Confirmation Modal -->
+            <div
+              id="scanner"
+              class="modal animate__animated animate__fadeIn animate__faster"
+            >
+              <div
+                class="modal-background"
+                style="cursor: pointer"
+                @click="toggle('scanner'), reset()"
+              ></div>
+              <div class="modal-content is-large">
+                <div class="card is-size-4">
+                  <div class="card-content">
+                    <div class="content">
+                      <div class="column">
+                        <!-- Scan QR -->
+                        <qrcode-stream
+                          v-if="qrActive"
+                          @decode="verify"
+                          style="
+                            background-image: url('loading.webp');
+                            background-repeat: no-repeat;
+                            background-position: center;
+                          "
+                        >
+                        </qrcode-stream>
+
+                        <!-- Show task details -->
+                        <div v-if="taskActive">
+                          <table
+                            class="table is-bordered is-striped is-narrow is-hoverable"
+                          >
+                            <div class="column">
+                              Patient name: {{task.name}}
+                            </div>
+                            <thead>
+                              <tr>
+                                <th>Medicine</th>
+                                <th>Quantity</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr v-for="(value, name) in task.prescription[0]">
+                                <td>{{name}}</td>
+                                <td>{{value}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <!-- Options -->
+                        <div class="column has-text-centered" v-if="!user">
+                          <div class="box has-text-weight-semibold is-size-6">
+                            <p>Scan QR Code to begin dispensing medicine!</p>
+                          </div>
+                        </div>
+                        <div class="column columns" v-if="user">
+                          <div
+                            class="column has-text-weight-semibold is-size-4 has-text-centered"
+                            v-if="user"
+                          >
+                            <p>Staff: {{user}}</p>
+                          </div>
+                          <div class="column">
+                            <button
+                              class="button is-success is-large"
+                              @click="title='Instructions'"
+                            >
+                              <a class="has-text-black has-text-weight-semibold"
+                                >Dispense Medicine!</a
+                              >
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Dispense Section -->
+        <div class="column">
+          <section
+            class="section animate__animated animate__fadeIn animate__faster"
+            v-if="title=='Instructions'"
+          >
+            <!-- Scanner/Confirmation Modal -->
+            <div class="container" v-for="med in task.prescription">
+              <div class="columns">
+                <div class="column is-one-fifth"></div>
+                <div class="column">
+                  <!-- Show medicine details -->
+                  <div
+                    class="card animate__animated animate__fadeIn animate__faster"
+                    v-for="(value, name, index) in med"
+                    id="index"
+                    v-if="currentIndex==index"
+                  >
+                    <div class="card-content">
+                      <div class="content">
+                        <div class="column">
+                          <div class="block">
+                            <h1>{{name}}</h1>
+                          </div>
+                          <div class="block">
+                            <strong>Dosage</strong>
+                            <br />{{instructions[name].dosage}}
+                          </div>
+                          <div class="block">
+                            <strong>Warning</strong>
+                            <br />{{instructions[name].warning}}
+                          </div>
+                          <div class="block"><strong>Allergies</strong></div>
+                          <ul>
+                            <li v-for="allergy in instructions[name].allergy">
+                              {{allergy}}
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="column">
+                      <nav class="level">
+                        <p class="level-item has-text-centered">
+                          <button
+                            class="button is-large"
+                            @click="go(-1)"
+                            v-if="hasPrevious"
+                          >
+                            <span class="icon">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                          </button>
+                        </p>
+                        <p class="level-item has-text-centered">
+                          <button
+                            v-bind:class="[{'has-background-danger': omitted.indexOf(index) != -1}, 'button']"
+                            :id="'preference'
+                            +
+                            index"
+                            @click="remove(index)"
+                          >
+                            <span class="icon">
+                              <i class="fas fa-times"></i>
+                            </span>
+                            <p class="subtitle">
+                              Patient does not want this medicine
+                            </p>
+                          </button>
+                        </p>
+                        <p class="level-item has-text-centered" v-if="hasNext">
+                          <button class="button is-large" @click="go(1)">
+                            <span class="icon">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                          </button>
+                        </p>
+                      </nav>
+                    </div>
+                  </div>
+
+                  <!-- Show confirmation details -->
+                  <div
+                    class="card animate__animated animate__fadeIn animate__faster"
+                    id="index"
+                    v-if="currentIndex==confirmationIndex"
+                  >
+                    <div class="card-content">
+                      <div class="content">
+                        <div class="column">
+                          <h2>Are you sure?</br></h2>
+                          <ul>
+                            <li
+                              v-for="(value, name, index) in med"
+                              v-if="!(index in omitted)"
+                            >
+                              {{value}}, {{name}}
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="column">
+                      <nav class="level">
+                        <p class="level-item has-text-centered">
+                          <button
+                            class="button is-large"
+                            @click="go(-1)"
+                            v-if="hasPrevious"
+                          >
+                            <span class="icon">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                          </button>
+                        </p>
+                        <p class="level-item has-text-centered" v-if="!hasNext">
+                          <button
+                            class="button is-primary is-large"
+                            @click="complete"
+                          >
+                            <span class="icon"
+                              ><i class="fas fa-clipboard-check"></i>
+                            </span>
+                            <p class="subtitle">Complete Task!</p>
+                          </button>
+                        </p>
+                        <p></p>
+                      </nav>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column is-one-fifth"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <!-- Help Section -->
+
+        <div
+          v-bind:class="[{'is-active': error} ,'modal animate__animated animate__fadeIn animate__faster']"
+        >
+          <div
+            class="modal-background"
+            style="cursor: pointer"
+            @click="toggle('scanner'), error=null"
+          ></div>
+          <div class="modal-content is-large">
+            <div class="card is-size-4 has-background-danger">
+              <div class="card-content">
+                <div class="content">
+                  <div class="column">
+                    <p
+                      class="has-text-centered has-text-weight-semibold is-size-3"
+                    >
+                      Error! {{error}}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="help"
+          class="modal animate__animated animate__fadeIn animate__faster"
+        >
+          <div
+            class="modal-background"
+            style="cursor: pointer"
+            @click="toggle('help')"
+          ></div>
+          <div class="modal-content is-large">
+            <div class="card is-size-4">
+              <div class="card-content">
+                <div class="content">
+                  <div class="column">help help</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="misc.js"></script>
+    <script src="counter.js"></script>
+    <script src="vueQR.js"></script>
+  </body>
+</html>
+
+<!-- Wallpaper -->
+<!-- Deduct inventory -->
+<!-- Exit/home button -->

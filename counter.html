@@ -66,7 +66,9 @@
               >
                 <div class="box has-text-centered">
                   <p class="title"><i class="fas fa-2x fa-id-card"></i></p>
-                  <p class="subtitle">Scan employee pass</p>
+                  <p class="subtitle has-text-weight-semibold">
+                    Scan employee pass
+                  </p>
                 </div>
               </div>
             </a>
@@ -101,7 +103,7 @@
                         <!-- Show task details -->
                         <div v-if="taskActive">
                           <table
-                            class="table is-bordered is-striped is-narrow is-hoverable"
+                            class="table is-bordered is-striped is-narrow is-hoverable is-size-4"
                           >
                             <div class="column">
                               Patient name: {{task.name}}
@@ -122,27 +124,30 @@
                         </div>
 
                         <!-- Options -->
-                        <div class="column has-text-centered" v-if="!user">
-                          <div class="box has-text-weight-semibold is-size-6">
-                            <p>Scan QR Code to begin dispensing medicine!</p>
+                        <div class="column is-mobile">
+                          <div class="column has-text-centered" v-if="!user">
+                            <div class="box has-text-weight-semibold is-size-6">
+                              <p>Scan QR Code to begin dispensing medicine!</p>
+                            </div>
                           </div>
-                        </div>
-                        <div class="column columns" v-if="user">
-                          <div
-                            class="column has-text-weight-semibold is-size-4 has-text-centered"
-                            v-if="user"
-                          >
-                            <p>Staff: {{user}}</p>
-                          </div>
-                          <div class="column">
-                            <button
-                              class="button is-success is-large"
-                              @click="title='Instructions'"
+                          <div class="column columns is-mobile" v-if="user">
+                            <div
+                              class="column has-text-weight-semibold is-size-4 has-text-centered"
+                              v-if="user"
                             >
-                              <a class="has-text-black has-text-weight-semibold"
-                                >Dispense Medicine!</a
+                              <p>Staff: {{user}}</p>
+                            </div>
+                            <div class="column">
+                              <button
+                                class="button is-success is-large"
+                                @click="title='Instructions'"
                               >
-                            </button>
+                                <a
+                                  class="has-text-black has-text-weight-semibold"
+                                  >Dispense Medicine!</a
+                                >
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -197,7 +202,7 @@
                     </div>
 
                     <div class="column">
-                      <nav class="level">
+                      <nav class="level is-mobile">
                         <p class="level-item has-text-centered">
                           <button
                             class="button is-large"
@@ -237,61 +242,98 @@
                   </div>
 
                   <!-- Show confirmation details -->
-                  <div
-                    class="card animate__animated animate__fadeIn animate__faster"
-                    id="index"
-                    v-if="currentIndex==confirmationIndex"
-                  >
-                    <div class="card-content">
-                      <div class="content">
-                        <div class="column">
-                          <h2>Are you sure?</br></h2>
-                          <ul>
-                            <li
-                              v-for="(value, name, index) in med"
-                              v-if="!(index in omitted)"
-                            >
-                              {{value}}, {{name}}
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="column">
-                      <nav class="level">
-                        <p class="level-item has-text-centered">
-                          <button
-                            class="button is-large"
-                            @click="go(-1)"
-                            v-if="hasPrevious"
-                          >
-                            <span class="icon">
-                              <i class="fas fa-chevron-left"></i>
-                            </span>
-                          </button>
-                        </p>
-                        <p class="level-item has-text-centered" v-if="!hasNext">
-                          <button
-                            class="button is-primary is-large"
-                            @click="complete"
-                          >
-                            <span class="icon"
-                              ><i class="fas fa-clipboard-check"></i>
-                            </span>
-                            <p class="subtitle">Complete Task!</p>
-                          </button>
-                        </p>
-                        <p></p>
-                      </nav>
-                    </div>
-                  </div>
                 </div>
 
                 <div class="column is-one-fifth"></div>
               </div>
             </div>
           </section>
+        </div>
+
+        <!-- Confirmation -->
+        <div class="column" v-if="title == 'Confirmation'">
+          <div class="container" v-for="med in task.prescription">
+            <div class="columns">
+              <div class="column is-one-fifth"></div>
+
+              <div class="column">
+                <div
+                  class="card animate__animated animate__fadeIn animate__faster"
+                >
+                  <div class="card-content">
+                    <div class="content">
+                      <div class="column">
+                        <div class="container">
+                          <h2>Dispensing to {{task.name}}</h2>
+                          <table
+                            class="table is-bordered is-striped is-narrow is-hoverable is-size-4"
+                          >
+                            <thead>
+                              <tr>
+                                <th>Medicine</th>
+                                <th>Quantity</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr
+                                v-for="(value, name, index) in med"
+                                v-if="!(index in omitted)"
+                              >
+                                <td>{{name}}</td>
+                                <td>{{value}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <div
+                            class="subtitle has-text-centered has-text-weight-semibold"
+                          >
+                            Are you sure?
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <nav class="level is-mobile">
+                      <p class="level-item has-text-centered">
+                        <button
+                          class="button is-danger is-large"
+                          @click="go(-1)"
+                          v-if="hasPrevious"
+                        >
+                          <span class="icon">
+                            <i class="fas fa-chevron-left"></i>
+                          </span>
+                          <p
+                            class="subtitle has-text-weight-semibold has-text-white"
+                          >
+                            No, I want to make changes.
+                          </p>
+                        </button>
+                      </p>
+                      <p class="level-item has-text-centered" v-if="!hasNext">
+                        <button
+                          class="button is-primary is-large"
+                          @click="complete"
+                        >
+                          <span class="icon"
+                            ><i
+                              class="fas fa-clipboard-check has-text-black"
+                            ></i>
+                          </span>
+                          <p class="subtitle has-text-weight-semibold">
+                            Yes I am sure!
+                          </p>
+                        </button>
+                      </p>
+                      <p></p>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+              <div class="column is-one-fifth"></div>
+            </div>
+          </div>
         </div>
         <!-- Help Section -->
 

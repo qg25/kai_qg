@@ -27,7 +27,6 @@ var application = new Vue({
             if (employees[id] == undefined)
                 this.error = "User not found."
             else {
-                console.log(tasks.length)
                 if (tasks.length == 0) {
                     this.error = "No active task found for user. Please accept a task or rescan."
                     return
@@ -74,7 +73,7 @@ var application = new Vue({
             this.hasPrevious = this.currentIndex > 0;
             this.hasNext = this.currentIndex < this.confirmationIndex;
 
-            // this.title = this.currentIndex == this.confirmationIndex ? 'Confirmation' : 'Instructions'
+            this.title = this.currentIndex == this.confirmationIndex ? 'Confirmation' : 'Instructions'
         },
         complete() {
             console.log('done')

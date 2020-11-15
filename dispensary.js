@@ -132,6 +132,7 @@ var application = new Vue({
       this.error = null;
       // Verify that user exists
       if (this.employees[user] == undefined) {
+        this.currentUser = null;
         this.error = 'User not recognized.';
         return;
       }

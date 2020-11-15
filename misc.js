@@ -63,17 +63,16 @@ const counterHelp =
     "Counter":
     {
         "How do I start?":
-            ["Ensure that you have accepted a task from the primary 'Tasks' console. An accepted task should be grayed out.",
+            ["Ensure that you have accepted a task from the primary 'Tasks' console. An accepted task should be greyed out.",
                 "Click 'Scan employee pass' and follow the on-screen instructions to start dispensing medicine.",
-                "If your task is grayed out, but you still encounter an error, Congratulations! You completed a task before the database updated.",
+                "If your task is greyed out, but you still encounter an error, Congratulations! You completed a task before the database updated.",
                 "Try again in 10 seconds, or click the update button at the bottom right of the screen"]
     },
     "Instructions":
     {
         "What should I take note of?":
             ["Go through the details of each medicine with the patient.",
-                "If the patient does not want a particular medicine, click on the 'Patient does not want this medication' button.",
-                "Ensure that the button turns RED before proceeding.",
+                "If the patient does not want a particular medicine, click on the 'Patient does not want this medicine' button and ensure that the button turns RED before proceeding.",
                 "Click on the exit button at the top left at anytime throughout dispensing to cancel the current task."]
 
     },
@@ -94,7 +93,7 @@ const taskHelp =
             ["Select a task from the 'Tasks' console by clicking on any white Tasks box.",
                 "Read through the task details.",
                 "Accept a task by scanning your QR code.",
-                "An accepted task should be grayed out.",
+                "An accepted task should be greyed out.",
                 "",
                 "Click the red button to stop working on an task.",]
     },

@@ -1,0 +1,7 @@
+{
+    "id": 1,
+    "name": "alice",
+    "prescription": [{"Esomeprazole": "10", "Amoxicillin": "20"}],
+    "doctor": "Prof Fauzi",
+    "available": "true"
+}

@@ -43,7 +43,6 @@
             {{title}}
           </h1>
         </div>
-        <section class="section">
           <section
             class="section"
             style="position: fixed; top: 0; left: 2.5vw"
@@ -89,7 +88,6 @@
               <p class="subtitle">Last updated: {{timeUpdated}}</p>
             </button>
           </section>
-        </section>
       </section>
       <!-- Main Screen Interface -->
       <section class="section">
@@ -98,18 +96,31 @@
             class="section animate__animated animate__fadeIn animate__faster"
             v-if="title=='Counter'"
           >
-            <div
-              class="column is-4 is-offset-one-third"
-              style="cursor: pointer"
-              @click="toggle('scanner')"
-            >
-              <div class="box has-text-centered">
-                <p class="title"><i class="fas fa-2x fa-id-card"></i></p>
-                <p class="subtitle has-text-weight-semibold">
-                  Scan employee pass
-                </p>
+              <div class="columns is-centered">
+                <div class="column is-one-third-fullhd is-half-tablet is-full-mobile  has-text-centered">
+                  <div class="column">
+                    <div class="block">
+                      <figure class="image">
+                      <img src="MHA.png"></img>
+                    </figure>
+                      <div
+                        class="column"
+                        style="cursor: pointer"
+                        @click="toggle('scanner')"
+                      >
+                        <div class="box has-text-centered">
+                          <p class="title">
+                            <i class="fas fa-2x fa-id-card"></i>
+                          </p>
+                          <p class="subtitle has-text-weight-semibold">
+                            Scan employee pass
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
 
             <!-- Scanner/Confirmation Modal -->
             <div

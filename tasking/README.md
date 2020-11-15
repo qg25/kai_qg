@@ -20,6 +20,6 @@
 
 **OR**
 
-> curl -k -i -H "Content-Type: application/json"\\<br>
-> &nbsp;-H "x-apikey: 5f9d636a231ba42851b49fd5"\\<br>
-> &nbsp;-X POST -d @tasking/task2.json https://hcitp-5edf.restdb.io/rest/tasks
+```curl -k -i -H "Content-Type: application/json"\
+ -H "x-apikey: 5f9d636a231ba42851b49fd5"\
+ -X POST -d @tasking/task2.json https://hcitp-5edf.restdb.io/rest/tasks```

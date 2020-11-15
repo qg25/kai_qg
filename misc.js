@@ -103,6 +103,7 @@ const taskHelp =
         "What can I do here?":
             ["Look through the medicine details.",
                 "Use the dropdown menu to change the notification threshold for low stocks.",
-                "Save and exit using the button on the bottom left.",]
+                "Changes are automatically saved.",
+                "Exit using the button on the bottom left.",]
     },
 }

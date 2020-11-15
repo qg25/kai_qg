@@ -177,10 +177,10 @@
                               class="columns animate__animated animate__fadeIn animate__faster is-size-5"
                             >
                               <div class="column has-text-right">
-                                <p>Staff:</p>
+                                <strong>Staff:</strong>
                               </div>
                               <div class="column has-text-left">
-                                <p>{{employees[currentUser]}}</p>
+                                <strong>{{employees[currentUser]}}</strong>
                               </div>
                             </div>
                           </div>
@@ -327,24 +327,12 @@
           <section class="section" style="position: fixed; bottom: 0">
             <button
               class="button is-warning is-large"
-              @click="toggleView"
-              v-if="(!changed)"
+              @click="pushInventory(); toggleView()"
             >
               <span class="icon">
                 <i class="fas fa-angle-left fa-lg"></i>
               </span>
-              <p class="subtitle">{{toggle}}</p></button
-            ><button
-              class="button is-primary is-large"
-              @click="pushInventory(); toggleView()"
-              v-if="(changed)"
-            >
-              <span class="icon">
-                <i class="fas fa-save fa-lg"></i>
-              </span>
-              <p class="subtitle has-text-white has-text-weight-semibold">
-                Save changes and exit
-              </p>
+              <p class="subtitle">{{toggle}}</p>
             </button>
           </section>
         </section>
@@ -354,7 +342,7 @@
         class="card has-background-danger"
         @click="showNotification()"
         v-if="low.length > 0"
-        style="cursor: pointer; position: fixed; bottom: 0; right: 2.5vw"
+        style="cursor: pointer; position: fixed; top: 0vh; right: 15vw"
       >
         <div class="card-content animate__animated animate__fadeIn">
           <div class="content">
@@ -408,7 +396,6 @@
               <div class="content">
                 <!--TODO help-->
                 <div class="column">
-                  <h3 class="has-text-centered">Help</h3>
                   <div class="block" v-for="(value, name) of taskHelp[title]">
                     {{name}}
                     <ul>

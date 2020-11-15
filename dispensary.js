@@ -24,14 +24,13 @@ var application = new Vue({
     locations: locations,
     toggle: "Inventory",
     employees: employees,
-    activeQR: [],
+    activeQR: null,
     currentUser: null,
     error: null,
     timer: 0,
     low: [],
     counter: null,
     updating: false,
-    changed: false,
     timeUpdated: "A long time ago",
   },
   methods: {
@@ -66,7 +65,11 @@ var application = new Vue({
           medicine.threshold = threshold;
           break;
         }
-      this.changed = true;
+
+      if (this.low.includes(name)) {
+        console.log('correct')
+        this.low.splice(this.low.indexOf(name), 1);
+      }
     },
     pushInventory() {
       for (var medicine of inventory)
@@ -78,7 +81,6 @@ var application = new Vue({
             xhr.setRequestHeader("x-apikey", apikey);
           },
         });
-      this.changed = false;
     },
     toggleView() {
       this.title == "Tasks"
@@ -88,6 +90,7 @@ var application = new Vue({
     toggleModal(i) {
       $("#modal" + i).toggleClass("is-active");
       this.activeQR = $("#modal" + i).hasClass("is-active") ? i : null;
+      this.currentUser = null;
       this.error = null;
     },
     toggleHelp() {
@@ -111,6 +114,7 @@ var application = new Vue({
       this.updateAvailableIndex();
     },
     verify(user) {
+      this.error = null;
       // Verify that user exists
       if (this.employees[user] == undefined) {
         this.error = 'User not recognized.';
@@ -151,8 +155,8 @@ var application = new Vue({
 
       this.low = []
 
-      // this.pushInventory()
-    }
+      this.pushInventory()
+    },
 
   },
 });

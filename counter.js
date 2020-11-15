@@ -22,6 +22,7 @@ var application = new Vue({
         updating: false,
         success: false,
         timer: null,
+        fetchInterval: null,
     },
     methods: {
         toggle(name) {
@@ -32,10 +33,6 @@ var application = new Vue({
             if (employees[id] == undefined)
                 this.error = "User not found."
             else {
-                if (tasks.length == 0) {
-                    this.error = "No active task found for user. Please accept a task or rescan."
-                    return
-                }
                 // Check if employee has a task
                 for (task of tasks)
                     if (task.delegate == id) {
@@ -50,10 +47,14 @@ var application = new Vue({
                         this.setView('Instructions')
                         return
                     }
-                    else {
-                        this.error = "No active task found for user. Please accept a task or rescan."
-                    }
+
+                this.error = "No active task found for user. Please accept a task or rescan."
+
             }
+        },
+        start() {
+            this.title = 'Instructions'
+            clearInterval(this.fetchInterval)
         },
         reset() {
             this.showLoading()
@@ -69,6 +70,8 @@ var application = new Vue({
             this.hasNext = true
             this.title = 'Counter'
             this.setView('Counter')
+
+            this.fetchInterval = setInterval(fetchTasks, 5000);
         },
         remove(i) {
             // Trickery
@@ -100,22 +103,21 @@ var application = new Vue({
             this.omitted.pop()
             for (const [index, item] of Object.keys(task.prescription[0]).entries()) {
                 if (this.omitted.indexOf(index) == -1) {
+                    console.log(parseInt(task.prescription[0][item]));
                     for (med in inventory) {
-                        if (inventory[med].name == item)
-                            inventory[med].quantity -= parseInt(task.prescription[0][item])
+                        if (inventory[med].name == item) {
+                            inventory[med].quantity -= parseInt(task.prescription[0][item]);
+                            $.ajax({
+                                url: "https://hcitp-5edf.restdb.io/rest/inventory/" + inventory[med]._id,
+                                data: inventory[med],
+                                type: "PUT",
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader("x-apikey", apikey);
+                                },
+                            });
+                        }
                     }
                 }
-            }
-
-            for (var medicine of inventory) {
-                $.ajax({
-                    url: "https://hcitp-5edf.restdb.io/rest/inventory/" + medicine._id,
-                    data: medicine,
-                    type: "PUT",
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("x-apikey", apikey);
-                    },
-                });
             }
 
             // Delete task from database
@@ -136,7 +138,7 @@ var application = new Vue({
         showSuccess() {
             this.title = 'Success'
             this.success = true;
-            this.timer = setInterval(this.clearSuccess, 1000);
+            this.timer = setInterval(this.clearSuccess, 2000);
         },
         showLoading() {
             this.updating = true;
@@ -198,4 +200,4 @@ function fetchInventory() {
 
 fetchTasks();
 fetchInventory();
-setInterval(fetchTasks, 5000);
+application.fetchInterval = setInterval(fetchTasks, 5000);

@@ -171,7 +171,7 @@ function fetchTasks() {
       xhr.setRequestHeader("x-apikey", apikey);
     },
     success: function (data) {
-      tasks = [];
+      tasks.splice(0, tasks.length)
       for (d in data) {
         tasks.push(data[d]);
       }

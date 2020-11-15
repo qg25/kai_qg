@@ -24,14 +24,13 @@ var application = new Vue({
     locations: locations,
     toggle: "Inventory",
     employees: employees,
-    activeQR: [],
+    activeQR: null,
     currentUser: null,
     error: null,
     timer: 0,
     low: [],
     counter: null,
     updating: false,
-    changed: false,
     timeUpdated: "A long time ago",
   },
   methods: {
@@ -66,7 +65,11 @@ var application = new Vue({
           medicine.threshold = threshold;
           break;
         }
-      this.changed = true;
+
+      if (this.low.includes(name)) {
+        console.log('correct')
+        this.low.splice(this.low.indexOf(name), 1);
+      }
     },
     pushInventory() {
       for (var medicine of inventory)
@@ -78,7 +81,6 @@ var application = new Vue({
             xhr.setRequestHeader("x-apikey", apikey);
           },
         });
-      this.changed = false;
     },
     toggleView() {
       this.title == "Tasks"
@@ -88,6 +90,7 @@ var application = new Vue({
     toggleModal(i) {
       $("#modal" + i).toggleClass("is-active");
       this.activeQR = $("#modal" + i).hasClass("is-active") ? i : null;
+      this.currentUser = null;
       this.error = null;
     },
     toggleHelp() {
@@ -111,6 +114,7 @@ var application = new Vue({
       this.updateAvailableIndex();
     },
     verify(user) {
+      this.error = null;
       // Verify that user exists
       if (this.employees[user] == undefined) {
         this.error = 'User not recognized.';
@@ -151,8 +155,8 @@ var application = new Vue({
 
       this.low = []
 
-      // this.pushInventory()
-    }
+      this.pushInventory()
+    },
 
   },
 });
@@ -167,26 +171,12 @@ function fetchTasks() {
       xhr.setRequestHeader("x-apikey", apikey);
     },
     success: function (data) {
-      var toDelete = [];
-      tasks.forEach(function (item, index) {
-        let exist = false;
+      tasks = [];
+      for (d in data) {
+        tasks.push(data[d]);
+      }
+      application.updateAvailableIndex();
 
-        data.forEach(function (dItem) {
-          if (item._id == dItem._id) exist = true;
-        });
-
-        if (!exist) toDelete.push(index);
-      });
-
-      toDelete.reverse();
-
-      toDelete.forEach(function (item) {
-        tasks.splice(item, 1);
-      });
-
-      data.forEach(function (item, index) {
-        if (item._id != tasks[index]._id) tasks.push(item);
-      });
 
       var timestamp = new Date().getTime()
       application.timeUpdated = new Date(timestamp).toLocaleTimeString('sg-SG')
@@ -241,28 +231,9 @@ function detectLow() {
   });
 }
 
-// Initial Taskings Request
-$.ajax({
-  url: "https://hcitp-5edf.restdb.io/rest/tasks",
-  data: {},
-  type: "GET",
-  beforeSend: function (xhr) {
-    xhr.setRequestHeader("x-apikey", apikey);
-  },
-  success: function (data) {
-    for (d in data) {
-      tasks.push(data[d]);
-    }
-    application.updateAvailableIndex();
+// Initial Requests
 
-
-    var timestamp = new Date().getTime()
-    application.timeUpdated = new Date(timestamp).toLocaleTimeString('sg-SG')
-    application.updating = false
-  },
-});
-
-
+fetchTasks()
 fetchInventory()
 
 setInterval(fetchTasks, 10000);

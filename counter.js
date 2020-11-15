@@ -170,13 +170,14 @@ function fetchTasks() {
             }
             application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
             application.updating = false
+
+            fetchTasks()
         },
     });
 }
 
 function userFetchTasks() {
     application.updating = true;
-    fetchTasks()
 }
 
 function fetchInventory() {
@@ -199,4 +200,3 @@ function fetchInventory() {
 
 fetchTasks();
 fetchInventory();
-application.fetchInterval = setInterval(fetchTasks, 5000);

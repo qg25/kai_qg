@@ -28,6 +28,8 @@ var application = new Vue({
     currentUser: null,
     error: null,
     timer: 0,
+    autoCloseTimer: null,
+    autoCloseInterval: null,
     low: [],
     counter: null,
     updating: false,
@@ -57,6 +59,17 @@ var application = new Vue({
           this.firstAvailableIndex = i;
           break;
         } else this.firstAvailableIndex++;
+      }
+    },
+    autoClose() {
+      this.autoCloseTimer -= 1;
+      if (this.autoCloseTimer <= 0) {
+        for (var i = 0; i < tasks.length; i++) {
+          if (!tasks[i].available) {
+            $('#modal' + i).removeClass("is-active");
+          }
+        }
+        clearInterval(this.autoCloseInterval)
       }
     },
     setThreshold(name, threshold) {
@@ -106,6 +119,11 @@ var application = new Vue({
           xhr.setRequestHeader("x-apikey", apikey);
         },
       });
+
+      if (!tasks[i].available) {
+        this.autoCloseTimer = 3
+        this.autoCloseInterval = setInterval(this.autoClose, 1000)
+      }
       this.currentUser = null;
       this.error = null;
       this.updateAvailableIndex();
@@ -204,6 +222,8 @@ function addTasks() {
 
       application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
       application.updating = false
+
+      addTasks()
     }
   });
 }
@@ -225,30 +245,15 @@ function fetchTasks() {
 
       application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
       application.updating = false
+
+
+      addTasks()
     },
   });
 }
 
 function userFetchTasks() {
   application.updating = true;
-  fetchTasks()
-}
-
-function fetchInventory() {
-  // Initial Inventory Request
-  $.ajax({
-    url: "https://hcitp-5edf.restdb.io/rest/inventory",
-    data: {},
-    type: "GET",
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader("x-apikey", apikey);
-    },
-    success: function (data) {
-      for (d in data) {
-        inventory.push(data[d]);
-      }
-    },
-  });
 }
 
 function detectLow() {
@@ -268,14 +273,33 @@ function detectLow() {
         }
         inventory[d].quantity = data[d].quantity
       }
+
+      detectLow()
     },
   });
 }
 
-// Initial Requests
+function fetchInventory() {
+  // Initial Inventory Request
+  $.ajax({
+    url: "https://hcitp-5edf.restdb.io/rest/inventory",
+    data: {},
+    type: "GET",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("x-apikey", apikey);
+    },
+    success: function (data) {
+      for (d in data) {
+        inventory.push(data[d]);
+      }
 
+      detectLow()
+    },
+  });
+}
+
+
+
+// Initial Requests
 fetchTasks()
 fetchInventory()
-
-setInterval(addTasks, 5000);
-setInterval(detectLow, 10000);

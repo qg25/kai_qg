@@ -171,26 +171,12 @@ function fetchTasks() {
       xhr.setRequestHeader("x-apikey", apikey);
     },
     success: function (data) {
-      var toDelete = [];
-      tasks.forEach(function (item, index) {
-        let exist = false;
+      tasks = [];
+      for (d in data) {
+        tasks.push(data[d]);
+      }
+      application.updateAvailableIndex();
 
-        data.forEach(function (dItem) {
-          if (item._id == dItem._id) exist = true;
-        });
-
-        if (!exist) toDelete.push(index);
-      });
-
-      toDelete.reverse();
-
-      toDelete.forEach(function (item) {
-        tasks.splice(item, 1);
-      });
-
-      data.forEach(function (item, index) {
-        if (item._id != tasks[index]._id) tasks.push(item);
-      });
 
       var timestamp = new Date().getTime()
       application.timeUpdated = new Date(timestamp).toLocaleTimeString('sg-SG')
@@ -245,28 +231,9 @@ function detectLow() {
   });
 }
 
-// Initial Taskings Request
-$.ajax({
-  url: "https://hcitp-5edf.restdb.io/rest/tasks",
-  data: {},
-  type: "GET",
-  beforeSend: function (xhr) {
-    xhr.setRequestHeader("x-apikey", apikey);
-  },
-  success: function (data) {
-    for (d in data) {
-      tasks.push(data[d]);
-    }
-    application.updateAvailableIndex();
+// Initial Requests
 
-
-    var timestamp = new Date().getTime()
-    application.timeUpdated = new Date(timestamp).toLocaleTimeString('sg-SG')
-    application.updating = false
-  },
-});
-
-
+fetchTasks()
 fetchInventory()
 
 setInterval(fetchTasks, 10000);

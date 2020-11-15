@@ -10,6 +10,7 @@
   **fixed**
 
 - Tasks will duplicate, when new tasks added to DB when tasks already loaded.
+  **probably fixed**
 
 - 15th Task will cover the **Last updated** button
   **fixed**

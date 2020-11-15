@@ -69,6 +69,7 @@
               <p class="subtitle">Help</p>
             </button>
           </section>
+          <!-- Timestamp -->
           <section
             class="section"
             style="position: fixed; bottom: 0; right: 2.5vw"
@@ -144,7 +145,11 @@
                             class="table is-bordered is-striped is-narrow is-hoverable is-size-4"
                           >
                             <div class="column">
-                              Patient name: {{task.name}}
+                              <p class="is-size-4">
+                                Patient Name: <strong>{{task.name}}</strong>
+                                <br />
+                                Patient ID Number: <strong>{{task.id}}</strong>
+                              </p>
                             </div>
                             <thead>
                               <tr>
@@ -375,8 +380,8 @@
             </div>
           </div>
         </div>
-        <!-- Help Section -->
 
+        <!-- Error Section -->
         <div
           v-bind:class="[{'is-active': error} ,'modal animate__animated animate__fadeIn animate__faster']"
         >
@@ -402,6 +407,7 @@
           </div>
         </div>
 
+        <!-- Help Section -->
         <div
           id="help"
           class="modal animate__animated animate__fadeIn animate__faster"

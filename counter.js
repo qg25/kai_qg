@@ -120,6 +120,16 @@ var application = new Vue({
                     });
                     break;
                 }
+
+            // Delete task from database
+            $.ajax({
+                url: "https://hcitp-5edf.restdb.io/rest/tasks/" + task._id,
+                data: task,
+                type: "DELETE",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("x-apikey", apikey);
+                },
+            });
         },
         clearSuccess() {
             this.success = false
@@ -129,7 +139,7 @@ var application = new Vue({
         showSuccess() {
             this.title = 'Success'
             this.success = true;
-            this.timer = setInterval(this.clearSuccess, 1500);
+            this.timer = setInterval(this.clearSuccess, 1000);
         },
         showLoading() {
             this.updating = true;
@@ -191,4 +201,4 @@ function fetchInventory() {
 
 fetchTasks();
 fetchInventory();
-setInterval(fetchTasks, 1000);
+setInterval(fetchTasks, 10000);

@@ -63,7 +63,7 @@ const counterHelp =
     "Counter":
     {
         "How do I start?":
-            ["Ensure that you have accepted a task from the primary 'Tasks' console. The particular task should be grayed out.",
+            ["Ensure that you have accepted a task from the primary 'Tasks' console. An accepted task should be grayed out.",
                 "Click 'Scan employee pass' and follow the on-screen instructions to start dispensing medicine.",
                 "If your task is grayed out, but you still encounter an error, Congratulations! You completed a task before the database updated.",
                 "Try again in 10 seconds, or click the update button at the bottom right of the screen"]
@@ -84,4 +84,25 @@ const counterHelp =
             "Click on the exit button at the top left at anytime throughout dispensing to cancel the current task."]
 
     }
+}
+
+const taskHelp =
+{
+    "Tasks":
+    {
+        "How do I start?":
+            ["Select a task from the 'Tasks' console by clicking on any white Tasks box.",
+                "Read through the task details.",
+                "Accept a task by scanning your QR code.",
+                "An accepted task should be grayed out.",
+                "",
+                "Click the red button to stop working on an task.",]
+    },
+    "Inventory":
+    {
+        "What can I do here?":
+            ["Look through the medicine details.",
+                "Use the dropdown menu to change the notification threshold for low stocks.",
+                "Save and exit using the button on the bottom left.",]
+    },
 }

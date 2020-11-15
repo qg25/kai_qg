@@ -37,6 +37,8 @@
         <div class="column has-text-centered">
           <h1 class="title is-size-1">{{title}}</h1>
         </div>
+
+        <!-- Help button -->
         <section class="section">
           <section
             class="section"
@@ -49,6 +51,27 @@
               <p class="subtitle">Help</p>
             </button>
           </section>
+        </section>
+
+        <!-- Timestamp -->
+        <section
+          class="section"
+          style="position: fixed; bottom: 0; right: 2.5vw"
+          v-if="title == 'Tasks'"
+        >
+          <button
+            class="button is-warning is-large is-loading"
+            disabled
+            v-if="updating"
+          ></button>
+          <button
+            class="button is-warning is-large"
+            @click="userFetchTasks"
+            v-if="!updating"
+          >
+            <span class="icon"><i class="fas fa-sync"></i> </span>
+            <p class="subtitle">Last updated: {{timeUpdated}}</p>
+          </button>
         </section>
       </section>
       <!-- Task View -->
@@ -67,8 +90,10 @@
               >
                 <div class="card-content animate__animated animate__fadeIn">
                   <div class="content">
-                    <h3>Task {{index + 1}}</h3>
-                    <p class="is-size-5">{{task.name}}</p>
+                    <h3>Patient Name: {{task.name}}</h3>
+                    <p class="is-size-5">
+                      {{len(task.prescription[0])}} Medicine(s)
+                    </p>
                   </div>
                 </div>
               </div>
@@ -91,7 +116,11 @@
                       <div class="content">
                         <div class="columns">
                           <div class="column has-text-left">
-                            <h4>Task {{index + 1}}</h4>
+                            <p class="is-size-4">
+                              <strong>{{task.name}}</strong>
+                              <br />
+                              ID Number: <strong>{{task.id}}</strong>
+                            </p>
                           </div>
                           <div
                             class="column has-text-right"
@@ -100,10 +129,6 @@
                             <p>Being done by: {{employees[task.delegate]}}</p>
                           </div>
                         </div>
-                        <p>
-                          Please retrieve the following medicine for:
-                          {{task.name}}
-                        </p>
                         <table
                           class="table is-bordered is-striped is-narrow is-hoverable"
                         >
@@ -179,7 +204,9 @@
                               @click="toggleTask(index)"
                               v-if="!task.available"
                             >
-                              <div :id="'content' + index">Put Back!</div>
+                              <div :id="'content' + index">
+                                Stop working on this task
+                              </div>
                             </button>
                           </div>
                         </div>
@@ -229,6 +256,7 @@
                 <th>Status</th>
                 <th>Location</th>
                 <th>Alert Threshold</th>
+                <th>Notified</th>
               </tr>
             </thead>
             <tfoot>
@@ -238,6 +266,7 @@
                 <th>Status</th>
                 <th>Location</th>
                 <th>Alert Threshold</th>
+                <th>Notified</th>
               </tr>
             </tfoot>
             <tbody>
@@ -279,6 +308,7 @@
                     </div>
                   </div>
                 </td>
+                <td>{{med.notified}}</td>
               </tr>
             </tbody>
           </table>
@@ -286,11 +316,26 @@
 
         <section class="section">
           <section class="section" style="position: fixed; bottom: 0">
-            <button class="button is-warning is-large" @click="toggleView()">
+            <button
+              class="button is-warning is-large"
+              @click="toggleView"
+              v-if="(!changed)"
+            >
               <span class="icon">
                 <i class="fas fa-angle-left fa-lg"></i>
               </span>
-              <p class="subtitle">{{toggle}}</p>
+              <p class="subtitle">{{toggle}}</p></button
+            ><button
+              class="button is-primary is-large"
+              @click="pushInventory(); toggleView()"
+              v-if="(changed)"
+            >
+              <span class="icon">
+                <i class="fas fa-save fa-lg"></i>
+              </span>
+              <p class="subtitle has-text-white has-text-weight-semibold">
+                Save changes and exit
+              </p>
             </button>
           </section>
         </section>
@@ -320,12 +365,18 @@
             <div class="card-content">
               <div class="content">
                 <div class="column">
-                  <h4>Low Stock Notified</h4>
+                  <h4>The following medicine is low in supply</h4>
                   <p v-for="item in low">{{item}}</p>
                 </div>
-                <button class="button is-large" @click="clearNotification()">
-                  Ok ({{timer}})
-                </button>
+                <div class="column has-text-centered">
+                  <div
+                    class="box"
+                    style="cursor: pointer"
+                    @click="clearNotification()"
+                  >
+                    Ok ({{timer}})
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -349,67 +400,14 @@
                 <!--TODO help-->
                 <div class="column">
                   <h3 class="has-text-centered">Help</h3>
-                  <ol>
-                    <li>
-                      Tasks
-                      <ul>
-                        <li>
-                          A loading icon can be seen if there are no available
-                          task.
-                        </li>
-                        <li>
-                          Boxes of task(s) will appear once there is/are task
-                          available.
-                        </li>
-                        <li>
-                          Boxes will turn grey once staff member accepts the
-                          task.
-                        </li>
-                      </ul>
-                    </li></br>
-                    <li>
-                      Accepting/Dismiss Task
-                      <ul>
-                        <li>
-                          Clicking the grey box to see prescription and staff
-                          who accepted the task.
-                        </li>
-                        <li>
-                          Clicking the white box to see the prescription and where to
-                          locate the medicine.
-                        </li>
-                        <li>
-                          Scan employee pass to accept the task.
-                        </li>
-                        <li>
-                          Error message will appear if staff have already
-                          accepted task.
-                        </li>
-                        <li>
-                          Click the green button to accept the task.
-                        </li>
-                        <li>
-                          Click the "Put Back!" button to reject the task if
-                          staff accidently accepts task.
-                        </li>
-                      </ul>
-                    </li></br>
-                    <li>
-                      Inventory
-                      <ul>
-                        <li>
-                          Click the "Inventory" button to access the inventory page.
-                        </li>
-                        <li> 
-                          Click the dropdown box to adjust the Alert Threshold for each 
-                          medicine when the medicine reaches certain level in quantity.
-                        </li>
-                        <li>
-                          Click the "Tasks" button to go back to the main page (Tasks).
-                        </li>
-                      </ul>
-                    </li>
-                  </ol>
+                  <div class="block" v-for="(value, name) of taskHelp[title]">
+                    {{name}}
+                    <ul>
+                      <p class="is-size-6" v-for="subvalue in value">
+                        {{subvalue}}
+                      </p>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -425,7 +423,5 @@
 </html>
 
 <!-- Words and stuff -->
-<!-- Settle low logic -->
-<!-- Help section -->
 <!-- Pagination and saving for inventory page -->
 <!-- Task comes in but not enough medication -->

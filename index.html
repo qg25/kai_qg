@@ -153,7 +153,7 @@
                           v-if="activeQR == index && task.available"
                           @decode="verify"
                           style="
-                            background-image: url('loading.webp');
+                            background-image: url('./assets/loading.webp');
                             background-repeat: no-repeat;
                             background-position: center;
                           "
@@ -397,9 +397,9 @@
       </div>
     </div>
 
-    <script src="misc.js"></script>
-    <script src="dispensary.js"></script>
-    <script src="vueQR.js"></script>
+    <script src="./js/misc.js"></script>
+    <script src="./js/dispensary.js"></script>
+    <script src="./js/vueQR.js"></script>
   </body>
 </html>
 

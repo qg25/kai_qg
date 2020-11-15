@@ -101,7 +101,7 @@
                   <div class="column">
                     <div class="block">
                       <figure class="image">
-                      <img src="MHA.png"></img>
+                      <img src="./assets/MHA.png"></img>
                     </figure>
                       <div
                         class="column"
@@ -142,7 +142,7 @@
                           v-if="qrActive &&!error"
                           @decode="verify"
                           style="
-                            background-image: url('loading.webp');
+                            background-image: url('./assets/loading.webp');
                             background-repeat: no-repeat;
                             background-position: center;
                           "
@@ -462,7 +462,7 @@
                   </h2>
                 </div>
                 <figure class="image is-square">
-                  <img src="loading.webp" />
+                  <img src="./assets/loading.webp" />
                 </figure>
               </div>
             </div>
@@ -487,9 +487,9 @@
       </section>
     </div>
 
-    <script src="misc.js"></script>
-    <script src="counter.js"></script>
-    <script src="vueQR.js"></script>
+    <script src="./js/misc.js"></script>
+    <script src="./js/counter.js"></script>
+    <script src="./js/vueQR.js"></script>
   </body>
 </html>
 

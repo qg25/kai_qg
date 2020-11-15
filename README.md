@@ -10,8 +10,16 @@
 
 - Load index.html at dispensary side.
 
+- There is a **Help** button for further instruction
+
 ## Counter Station
 
 - Load counter.html at counter side.
 
+- There is a **Help** button for further instruction
+
 ## Both station needs to have webcam enabled system.
+
+## Sending Tasking
+
+- Follow the README.md in the tasking folder.

@@ -1,0 +1,14 @@
+[{
+    "id": 2,
+    "name": "alibaba",
+    "prescription": [{"Esomeprazole": "10", "Amoxicillin": "20"}],
+    "doctor": "Patrick",
+    "available": "true"
+},
+{
+    "id": 3,
+    "name": "mary",
+    "prescription": [{"Amoxicillin": "10", "Esomeprazole": "20"}],
+    "doctor": "Prof Fauzi",
+    "available": "true"
+}]

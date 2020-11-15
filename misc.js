@@ -72,7 +72,7 @@ const counterHelp =
     {
         "What should I take note of?":
             ["Go through the details of each medicine with the patient.",
-                "If the patient is does not want a particular medicine, click on the 'Patient does not want this medication' button.",
+                "If the patient does not want a particular medicine, click on the 'Patient does not want this medication' button.",
                 "Ensure that the button turns RED before proceeding.",
                 "Click on the exit button at the top left at anytime throughout dispensing to cancel the current task."]
 

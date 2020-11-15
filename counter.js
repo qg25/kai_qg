@@ -23,6 +23,9 @@ var application = new Vue({
         success: false,
         timer: null,
         fetchInterval: null,
+
+        lastUpdated: 'A long time ago',
+        lastUpdatedTimer: null,
     },
     methods: {
         toggle(name) {
@@ -97,6 +100,10 @@ var application = new Vue({
         setView(i) {
             this.view = i
         },
+        updateTimer() {
+            let time = Math.round((new Date().getTime() - this.timeUpdated) / 1000);
+            this.lastUpdated = time < 60 ? time + "s ago" : Math.round(time / 60) + "minute(s) ago";
+        },
         updateInventory() {
             // force update
             this.omitted.push(-1);
@@ -168,7 +175,10 @@ function fetchTasks() {
             for (d in data) {
                 tasks.push(data[d]);
             }
-            application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
+            application.timeUpdated = new Date().getTime()
+            if (application.lastUpdatedTimer == null) {
+                application.lastUpdatedTimer = setInterval(application.updateTimer, 1000)
+            }
             application.updating = false
 
             fetchTasks()

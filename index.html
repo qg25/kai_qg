@@ -91,8 +91,17 @@
                 <div class="card-content animate__animated animate__fadeIn">
                   <div class="content">
                     <h3>Patient Name: {{task.name}}</h3>
-                    <p class="is-size-5">
-                      {{len(task.prescription[0])}} Medicine(s)
+                    <p
+                      class="is-size-5"
+                      v-if="Object.keys(task.prescription[0]).length>1"
+                    >
+                      {{Object.keys(task.prescription[0]).length}} Medicines
+                    </p>
+                    <p
+                      class="is-size-5"
+                      v-if="Object.keys(task.prescription[0]).length==1"
+                    >
+                      {{Object.keys(task.prescription[0]).length}} Medicine
                     </p>
                   </div>
                 </div>

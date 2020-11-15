@@ -98,19 +98,18 @@
             class="section animate__animated animate__fadeIn animate__faster"
             v-if="title=='Counter'"
           >
-            <a>
-              <div
-                class="column is-4 is-offset-one-third"
-                @click="toggle('scanner')"
-              >
-                <div class="box has-text-centered">
-                  <p class="title"><i class="fas fa-2x fa-id-card"></i></p>
-                  <p class="subtitle has-text-weight-semibold">
-                    Scan employee pass
-                  </p>
-                </div>
+            <div
+              class="column is-4 is-offset-one-third"
+              style="cursor: pointer"
+              @click="toggle('scanner')"
+            >
+              <div class="box has-text-centered">
+                <p class="title"><i class="fas fa-2x fa-id-card"></i></p>
+                <p class="subtitle has-text-weight-semibold">
+                  Scan employee pass
+                </p>
               </div>
-            </a>
+            </div>
 
             <!-- Scanner/Confirmation Modal -->
             <div

@@ -107,19 +107,16 @@ var application = new Vue({
                 }
             }
 
-            for (var medicine of inventory)
-                if (medicine.name == name) {
-                    medicine.threshold = threshold;
-                    $.ajax({
-                        url: "https://hcitp-5edf.restdb.io/rest/inventory/" + medicine._id,
-                        data: medicine,
-                        type: "PUT",
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader("x-apikey", apikey);
-                        },
-                    });
-                    break;
-                }
+            for (var medicine of inventory) {
+                $.ajax({
+                    url: "https://hcitp-5edf.restdb.io/rest/inventory/" + medicine._id,
+                    data: medicine,
+                    type: "PUT",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("x-apikey", apikey);
+                    },
+                });
+            }
 
             // Delete task from database
             $.ajax({
@@ -201,4 +198,4 @@ function fetchInventory() {
 
 fetchTasks();
 fetchInventory();
-setInterval(fetchTasks, 10000);
+setInterval(fetchTasks, 5000);

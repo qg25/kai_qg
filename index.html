@@ -56,7 +56,7 @@
         <!-- Timestamp -->
         <section
           class="section"
-          style="position: fixed; bottom: 0; right: 2.5vw"
+          style="position: fixed; bottom: 0; right: 2.5vw; z-index: 1000"
           v-if="title == 'Tasks'"
         >
           <button
@@ -256,7 +256,6 @@
                 <th>Status</th>
                 <th>Location</th>
                 <th>Alert Threshold</th>
-                <th>Notified</th>
               </tr>
             </thead>
             <tfoot>
@@ -266,7 +265,6 @@
                 <th>Status</th>
                 <th>Location</th>
                 <th>Alert Threshold</th>
-                <th>Notified</th>
               </tr>
             </tfoot>
             <tbody>
@@ -308,7 +306,6 @@
                     </div>
                   </div>
                 </td>
-                <td>{{med.notified}}</td>
               </tr>
             </tbody>
           </table>
@@ -316,10 +313,7 @@
 
         <section class="section">
           <section class="section" style="position: fixed; bottom: 0">
-            <button
-              class="button is-warning is-large"
-              @click="pushInventory(); toggleView()"
-            >
+            <button class="button is-warning is-large" @click="toggleView()">
               <span class="icon">
                 <i class="fas fa-angle-left fa-lg"></i>
               </span>

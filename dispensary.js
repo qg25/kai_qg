@@ -63,6 +63,14 @@ var application = new Vue({
       for (var medicine of this.inventory)
         if (medicine.name == name) {
           medicine.threshold = threshold;
+          $.ajax({
+            url: "https://hcitp-5edf.restdb.io/rest/inventory/" + medicine._id,
+            data: medicine,
+            type: "PUT",
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("x-apikey", apikey);
+            },
+          });
           break;
         }
 
@@ -70,17 +78,6 @@ var application = new Vue({
         console.log('correct')
         this.low.splice(this.low.indexOf(name), 1);
       }
-    },
-    pushInventory() {
-      for (var medicine of inventory)
-        $.ajax({
-          url: "https://hcitp-5edf.restdb.io/rest/inventory/" + medicine._id,
-          data: medicine,
-          type: "PUT",
-          beforeSend: function (xhr) {
-            xhr.setRequestHeader("x-apikey", apikey);
-          },
-        });
     },
     toggleView() {
       this.title == "Tasks"
@@ -137,7 +134,7 @@ var application = new Vue({
       this.timer -= 1;
       if (this.timer <= 0) {
         clearInterval(this.counter)
-        $("#modal-noti").removeClass("is-active");
+        this.clearNotification()
       }
     },
     showNotification() {
@@ -150,18 +147,68 @@ var application = new Vue({
       $("#modal-noti").removeClass("is-active");
 
       for (med of inventory)
-        if (this.low.includes(med.name))
+        if (this.low.includes(med.name)) {
           med.notified = true
-
+          $.ajax({
+            url: "https://hcitp-5edf.restdb.io/rest/inventory/" + med._id,
+            data: med,
+            type: "PUT",
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("x-apikey", apikey);
+            },
+          });
+        }
       this.low = []
-
-      this.pushInventory()
     },
 
   },
 });
 
-// Subsequent updating of Tasks
+function addTasks() {
+  $.ajax({
+    url: "https://hcitp-5edf.restdb.io/rest/tasks",
+    data: {},
+    type: "GET",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("x-apikey", apikey);
+    },
+    success: function (data) {
+
+      // Removing deleted stuff
+      for (task in tasks) {
+        var inside = false;
+        for (d in data) {
+          if (data[d]._id == tasks[task]._id) {
+            inside = true
+          }
+        }
+        if (!inside) {
+          tasks.splice(tasks.indexOf(tasks[task]), 1)
+        }
+      }
+
+      // Adding missing stuff
+      for (d in data) {
+        var inside = false;
+        for (task in tasks) {
+          if (data[d]._id == tasks[task]._id) {
+            inside = true
+          }
+        } if (!inside) {
+          tasks.push(data[d])
+        }
+      }
+
+      application.updateAvailableIndex();
+
+
+      application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
+      application.updating = false
+    }
+  });
+}
+
+// Initial updating of Tasks
 function fetchTasks() {
   $.ajax({
     url: "https://hcitp-5edf.restdb.io/rest/tasks",
@@ -171,15 +218,12 @@ function fetchTasks() {
       xhr.setRequestHeader("x-apikey", apikey);
     },
     success: function (data) {
-      tasks.splice(0, tasks.length)
       for (d in data) {
         tasks.push(data[d]);
       }
       application.updateAvailableIndex();
 
-
-      var timestamp = new Date().getTime()
-      application.timeUpdated = new Date(timestamp).toLocaleTimeString('sg-SG')
+      application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
       application.updating = false
     },
   });
@@ -201,9 +245,6 @@ function fetchInventory() {
     },
     success: function (data) {
       for (d in data) {
-        if (data[d].quantity > data[d].threshold) {
-          data[d].notified = false
-        }
         inventory.push(data[d]);
       }
     },
@@ -236,5 +277,5 @@ function detectLow() {
 fetchTasks()
 fetchInventory()
 
-setInterval(fetchTasks, 10000);
+setInterval(addTasks, 5000);
 setInterval(detectLow, 10000);

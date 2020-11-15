@@ -168,8 +168,7 @@ function fetchTasks() {
             for (d in data) {
                 tasks.push(data[d]);
             }
-            var timestamp = new Date().getTime()
-            application.timeUpdated = new Date(timestamp).toLocaleTimeString('sg-SG')
+            application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
             application.updating = false
         },
     });

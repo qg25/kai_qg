@@ -34,6 +34,10 @@ var application = new Vue({
     counter: null,
     updating: false,
     timeUpdated: "A long time ago",
+
+
+    lastUpdated: 'A long time ago',
+    lastUpdatedTimer: null,
   },
   methods: {
     round(i) {
@@ -128,6 +132,10 @@ var application = new Vue({
       this.error = null;
       this.updateAvailableIndex();
     },
+    updateTimer() {
+      let time = Math.round((new Date().getTime() - this.timeUpdated) / 1000);
+      this.lastUpdated = time < 60 ? time + "s ago" : Math.round(time / 60) + "minute(s) ago";
+    },
     verify(user) {
       this.error = null;
       // Verify that user exists
@@ -221,7 +229,7 @@ function addTasks() {
       application.updateAvailableIndex();
 
 
-      application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
+      application.timeUpdated = new Date().getTime()
       application.updating = false
 
       addTasks()
@@ -244,8 +252,10 @@ function fetchTasks() {
       }
       application.updateAvailableIndex();
 
-      application.timeUpdated = new Date(new Date().getTime()).toLocaleTimeString('sg-SG')
-      application.updating = false
+      application.timeUpdated = new Date().getTime()
+      if (application.lastUpdatedTimer == null) {
+        application.lastUpdatedTimer = setInterval(application.updateTimer, 1000)
+      }
 
 
       addTasks()

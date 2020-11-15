@@ -1,14 +1,26 @@
-[{
-    "id": 2,
-    "name": "alibaba",
-    "prescription": [{"Esomeprazole": "10", "Amoxicillin": "20"}],
-    "doctor": "Patrick",
-    "available": "true"
-},
-{
-    "id": 3,
-    "name": "mary",
-    "prescription": [{"Amoxicillin": "10", "Esomeprazole": "20"}],
-    "doctor": "Prof Fauzi",
-    "available": "true"
-}]
+[
+    {
+        "id": "S9301122A",
+        "name": "Alibaba Tang",
+        "prescription": [
+            {
+                "Esomeprazole": "10",
+                "Amoxicillin": "20"
+            }
+        ],
+        "doctor": "Prof Cao Qi",
+        "available": "true"
+    },
+    {
+        "id": "9201234B",
+        "name": "Mary Ng",
+        "prescription": [
+            {
+                "Amoxicillin": "10",
+                "Esomeprazole": "20"
+            }
+        ],
+        "doctor": "Prof Jeannie",
+        "available": "true"
+    }
+]

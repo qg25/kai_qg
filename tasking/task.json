@@ -1,8 +1,12 @@
 {
     "id": "S1234567J",
     "name": "Alice Tan",
-    "prescription": [{"Esomeprazole": "10", "Amoxicillin": "20"}],
+    "prescription": [
+        {
+            "Esomeprazole": "10",
+            "Amoxicillin": "20"
+        }
+    ],
     "doctor": "Prof Fauzi",
-    "available": "true",
-    "delegate" : 821
+    "available": "true"
 }

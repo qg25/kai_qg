@@ -57,3 +57,31 @@ const instructions = {
         ]
     }
 }
+
+const counterHelp =
+{
+    "Counter":
+    {
+        "How do I start?":
+            ["Ensure that you have accepted a task from the primary 'Tasks' console. The particular task should be grayed out.",
+                "Click 'Scan employee pass' and follow the on-screen instructions to start dispensing medicine.",
+                "If your task is grayed out, but you still encounter an error, Congratulations! You completed a task before the database updated.",
+                "Try again in 10 seconds, or click the update button at the bottom right of the screen"]
+    },
+    "Instructions":
+    {
+        "What should I take note of?":
+            ["Go through the details of each medicine with the patient.",
+                "If the patient is does not want a particular medicine, click on the 'Patient does not want this medication' button.",
+                "Ensure that the button turns RED before proceeding.",
+                "Click on the exit button at the top left at anytime throughout dispensing to cancel the current task."]
+
+    },
+    "Confirmation": {
+        "Confirmation": ["Confirm all the details of the current task.",
+            "Click on green button to confirm the details displayed is correct.",
+            "If there are any changes, click on the red button to return to the previous pages to edit.",
+            "Click on the exit button at the top left at anytime throughout dispensing to cancel the current task."]
+
+    }
+}

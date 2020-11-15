@@ -36,18 +36,56 @@
       <!-- Nav Bar -->
       <section class="section columns is-mobile">
         <div class="column has-text-centered">
-          <h1 class="title is-size-1">{{title}}</h1>
+          <h1
+            class="title is-size-1"
+            v-if="!(['Counter', 'Refresh', 'Success'].includes(title))"
+          >
+            {{title}}
+          </h1>
         </div>
         <section class="section">
           <section
             class="section"
+            style="position: fixed; top: 0; left: 2.5vw"
+            v-if="!(['Counter', 'Refresh', 'Success'].includes(title))"
+          >
+            <button class="button is-danger is-large" @click="reset">
+              <span class="icon"><i class="fas fa-door-open"></i> </span>
+              <p class="subtitle has-text-white">Exit</p>
+            </button>
+          </section>
+          <section
+            class="section"
             style="position: fixed; top: 0; right: 2.5vw"
           >
-            <button class="button is-warning is-large" @click="toggle('help')">
+            <button
+              class="button is-warning is-large"
+              @click="toggle('help')"
+              v-if="!(['Refresh', 'Success'].includes(title))"
+            >
               <span class="icon">
                 <i class="fas fa-question"></i>
               </span>
               <p class="subtitle">Help</p>
+            </button>
+          </section>
+          <section
+            class="section"
+            style="position: fixed; bottom: 0; right: 2.5vw"
+            v-if="title == 'Counter'"
+          >
+            <button
+              class="button is-warning is-large is-loading"
+              disabled
+              v-if="updating"
+            ></button>
+            <button
+              class="button is-warning is-large"
+              @click="userFetchTasks"
+              v-if="!updating"
+            >
+              <span class="icon"><i class="fas fa-sync"></i> </span>
+              <p class="subtitle">Last updated: {{timeUpdated}}</p>
             </button>
           </section>
         </section>
@@ -84,13 +122,13 @@
                 @click="toggle('scanner'), reset()"
               ></div>
               <div class="modal-content is-large">
-                <div class="card is-size-4">
+                <div class="card has-background-white-bis is-size-4">
                   <div class="card-content">
                     <div class="content">
                       <div class="column">
                         <!-- Scan QR -->
                         <qrcode-stream
-                          v-if="qrActive"
+                          v-if="qrActive &&!error"
                           @decode="verify"
                           style="
                             background-image: url('loading.webp');
@@ -172,7 +210,7 @@
                 <div class="column">
                   <!-- Show medicine details -->
                   <div
-                    class="card animate__animated animate__fadeIn animate__faster"
+                    class="card has-background-white-bis animate__animated animate__fadeIn animate__faster"
                     v-for="(value, name, index) in med"
                     id="index"
                     v-if="currentIndex==index"
@@ -258,36 +296,38 @@
 
               <div class="column">
                 <div
-                  class="card animate__animated animate__fadeIn animate__faster"
+                  class="card has-background-white-bis animate__animated animate__fadeIn animate__faster"
                 >
                   <div class="card-content">
                     <div class="content">
                       <div class="column">
                         <div class="container">
-                          <h2>Dispensing to {{task.name}}</h2>
-                          <table
-                            class="table is-bordered is-striped is-narrow is-hoverable is-size-4"
-                          >
-                            <thead>
-                              <tr>
-                                <th>Medicine</th>
-                                <th>Quantity</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr
-                                v-for="(value, name, index) in med"
-                                v-if="!(index in omitted)"
-                              >
-                                <td>{{name}}</td>
-                                <td>{{value}}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <div
-                            class="subtitle has-text-centered has-text-weight-semibold"
-                          >
-                            Are you sure?
+                          <h2 class="has-text-centered">Dispensing Details</h2>
+                          <div class="box has-background-warning-light">
+                            <p class="is-size-4">
+                              Patient Name: <strong>{{task.name}}</strong>
+                              <br />
+                              Patient ID Number: <strong>{{task.id}}</strong>
+                            </p>
+                            <table
+                              class="table is-bordered is-striped is-narrow is-hoverable is-size-4"
+                            >
+                              <thead>
+                                <tr>
+                                  <th>Medicine</th>
+                                  <th>Quantity</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr
+                                  v-for="(value, name, index) in med"
+                                  v-if="!(omitted.includes(index))"
+                                >
+                                  <td>{{name}}</td>
+                                  <td>{{value}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       </div>
@@ -378,59 +418,57 @@
                   <!--TODO help-->
                   <div class="column">
                     <h3 class="has-text-centered">Help</h3>
-                    <ol>
-                      <li>
-                        Click "Scan employee pass" to start scanning.
-                        <ul>
-                          <li>
-                            If there is an error/no task available after
-                            scanning, click out of the box to reset.
-                          </li>
-                        </ul>
-                      </li></br>
-                      <li>
-                        Confirm particulars and prescription before clicking
-                        "Dispense Medicine".
-                      </li></br>
-                      <li>
-                        Instructions of medicine will be shown.
-                        <ul>
-                          <li>
-                            Clicking the "Right/Left Arrow Button" will scroll
-                            through each medicine.
-                          </li>
-                        </ul>
-                      </li></br>
-                      <li>
-                        Clicking "Patient does not want this medicine" if
-                        patient is not taking that particular medicine.
-                        <ul>
-                          <li>
-                            Button turns red is an indication that patient is
-                            not taking that medicine.
-                          </li>
-                        </ul>
-                      </li></br>
-                      <li>
-                        Confirmation
-                        <ul>
-                          <li>
-                            Click the green button to confirm the information
-                            displayed is correct.
-                          </li>
-                          <li>
-                            Click the red button to return to the previous page
-                            to edit.
-                          </li>
-                        </ul>
-                      </li>
-                    </ol>
+                    <div
+                      class="block"
+                      v-for="(value, name) of counterHelp[title]"
+                    >
+                      {{name}}
+                      <ul>
+                        <p class="is-size-6" v-for="subvalue in value">
+                          {{subvalue}}
+                        </p>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Refreshing Interface -->
+        <section class="section" v-if="title=='Refresh'">
+          <div class="columns is-vcentered is-centered">
+            <div class="column is-one-fifth has-text-centered">
+              <div class="box">
+                <div class="block">
+                  <h2 class="subtitle has-text-weight-semibold">
+                    Refreshing..
+                  </h2>
+                </div>
+                <figure class="image is-square">
+                  <img src="loading.webp" />
+                </figure>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Success Interface -->
+        <section class="section" v-if="title=='Success'">
+          <div class="columns is-vcentered is-centered">
+            <div class="column is-one-fifth has-text-centered">
+              <div class="box has-background-success">
+                <div class="block">
+                  <h2 class="subtitle has-text-weight-semibold">
+                    Task completed!
+                  </h2>
+                </div>
+                <i class="fas fa-check fa-9x"></i>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </div>
 

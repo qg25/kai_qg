@@ -173,6 +173,23 @@ function updateTasks() {
   });
 }
 
+function fetchInventory() {
+  // Initial Inventory Request
+  $.ajax({
+    url: "https://hcitp-5edf.restdb.io/rest/inventory",
+    data: {},
+    type: "GET",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("x-apikey", apikey);
+    },
+    success: function (data) {
+      for (d in data) {
+        inventory.push(data[d]);
+      }
+    },
+  });
+}
+
 // Initial Taskings Request
 $.ajax({
   url: "https://hcitp-5edf.restdb.io/rest/tasks",
@@ -189,19 +206,9 @@ $.ajax({
   },
 });
 
-// Initial Inventory Request
-$.ajax({
-  url: "https://hcitp-5edf.restdb.io/rest/inventory",
-  data: {},
-  type: "GET",
-  beforeSend: function (xhr) {
-    xhr.setRequestHeader("x-apikey", apikey);
-  },
-  success: function (data) {
-    for (d in data) {
-      inventory.push(data[d]);
-    }
-  },
-});
 
-setInterval(updateTasks, 1000);
+
+fetchInventory()
+
+setInterval(updateTasks, 5000);
+setInterval(fetchInventory, 5000);

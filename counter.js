@@ -5,6 +5,7 @@ var application = new Vue({
     el: "#counter",
     data: {
         title: "Counter",
+        counterHelp: counterHelp,
         employees: employees,
         instructions: instructions,
         qrActive: false,
@@ -17,6 +18,10 @@ var application = new Vue({
         currentIndex: 0,
         hasPrevious: false,
         hasNext: true,
+        timeUpdated: 'A long time ago',
+        updating: false,
+        success: false,
+        timer: null,
     },
     methods: {
         toggle(name) {
@@ -41,6 +46,8 @@ var application = new Vue({
 
                         // Only set user when task is found.
                         this.user = employees[id];
+
+                        this.setView('Instructions')
                         return
                     }
                     else {
@@ -49,13 +56,22 @@ var application = new Vue({
             }
         },
         reset() {
-            this.qrActive = false;
-            this.taskActive = false;
-            this.user = null;
-            this.task = null;
-            this.error = null;
+            this.showLoading()
+            this.qrActive = false
+            this.taskActive = false
+            this.user = null
+            this.task = null
+            this.confirmationIndex = null
+            this.error = null
+            this.omitted = []
+            this.currentIndex = 0
+            this.hasPrevious = false
+            this.hasNext = true
+            this.title = 'Counter'
+            this.setView('Counter')
         },
         remove(i) {
+            // Trickery
             k = this.omitted.indexOf(i)
 
             if (k != -1) {
@@ -64,8 +80,6 @@ var application = new Vue({
             else {
                 this.omitted.push(i);
             }
-
-            console.log(this.omitted)
         },
         go(i) {
             this.currentIndex += i;
@@ -74,17 +88,65 @@ var application = new Vue({
             this.hasNext = this.currentIndex < this.confirmationIndex;
 
             this.title = this.currentIndex == this.confirmationIndex ? 'Confirmation' : 'Instructions'
+
+            this.setView(this.title)
+        },
+        setView(i) {
+            this.view = i
+        },
+        updateInventory() {
+            // force update
+            this.omitted.push(-1);
+            this.omitted.pop()
+            for (const [index, item] of Object.keys(task.prescription[0]).entries()) {
+                if (this.omitted.indexOf(index) == -1) {
+                    for (med in inventory) {
+                        if (inventory[med].name == item)
+                            inventory[med].quantity -= parseInt(task.prescription[0][item])
+                    }
+                }
+            }
+
+            for (var medicine of inventory)
+                if (medicine.name == name) {
+                    medicine.threshold = threshold;
+                    $.ajax({
+                        url: "https://hcitp-5edf.restdb.io/rest/inventory/" + medicine._id,
+                        data: medicine,
+                        type: "PUT",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("x-apikey", apikey);
+                        },
+                    });
+                    break;
+                }
+        },
+        clearSuccess() {
+            this.success = false
+            clearInterval(this.timer)
+            this.reset()
+        },
+        showSuccess() {
+            this.title = 'Success'
+            this.success = true;
+            this.timer = setInterval(this.clearSuccess, 1500);
+        },
+        showLoading() {
+            this.updating = true;
+            this.title = 'Refresh'
+            fetchTasks()
         },
         complete() {
-            console.log('done')
-        }
+            this.updateInventory()
+            this.showSuccess()
+        },
     },
 });
 
 // Populate tasks
 
-// Subsequent updating of Tasks
-function updateTasks() {
+// Updating of Tasks
+function fetchTasks() {
     $.ajax({
         url: "https://hcitp-5edf.restdb.io/rest/tasks",
         data: {},
@@ -97,24 +159,36 @@ function updateTasks() {
             for (d in data) {
                 tasks.push(data[d]);
             }
+            var timestamp = new Date().getTime()
+            application.timeUpdated = new Date(timestamp).toLocaleTimeString('sg-SG')
+            application.updating = false
         },
     });
 }
 
-// Initial Inventory Request
-$.ajax({
-    url: "https://hcitp-5edf.restdb.io/rest/inventory",
-    data: {},
-    type: "GET",
-    beforeSend: function (xhr) {
-        xhr.setRequestHeader("x-apikey", apikey);
-    },
-    success: function (data) {
-        for (d in data) {
-            inventory.push(data[d]);
-        }
-    },
-});
+function userFetchTasks() {
+    application.updating = true;
+    fetchTasks()
+}
 
-updateTasks();
-setInterval(updateTasks, 1000);
+function fetchInventory() {
+    // Initial Inventory Request
+    $.ajax({
+        url: "https://hcitp-5edf.restdb.io/rest/inventory",
+        data: {},
+        type: "GET",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("x-apikey", apikey);
+        },
+        success: function (data) {
+            for (d in data) {
+                inventory.push(data[d]);
+            }
+        },
+    });
+
+}
+
+fetchTasks();
+fetchInventory();
+setInterval(fetchTasks, 1000);
